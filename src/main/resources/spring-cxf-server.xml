@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+					http://www.springframework.org/schema/context 
+					http://www.springframework.org/schema/context/spring-context-3.0.xsd
+   	 				http://cxf.apache.org/jaxrs
+    				http://cxf.apache.org/schemas/jaxrs.xsd
+    				http://cxf.apache.org/core 
+    				http://cxf.apache.org/schemas/core.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<context:annotation-config />
+
+	<bean id="inMessageInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+	<bean id="outMessageInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+
+	<!-- 配置RESTful标准Web Service发布方式======开始======== -->
+	<!-- 这里的地址很重要，客户端需要通过这个地址来访问WebService -->
+	<jaxrs:server id="restServiceContainer" address="/">
+		<jaxrs:inInterceptors>
+			<bean class="cn.st.cxf.rs.interceptor.LogInInterceptor"></bean>
+		</jaxrs:inInterceptors>
+		<jaxrs:outInterceptors>
+			<bean class="cn.st.cxf.rs.interceptor.LogOutInterceptor"></bean>
+		</jaxrs:outInterceptors>
+		<jaxrs:serviceBeans>
+			<bean class="cn.st.cxf.rs.server.impl.StudentWSImpl"></bean>
+		</jaxrs:serviceBeans>
+		<jaxrs:extensionMappings>
+			<entry key="json" value="application/json" />
+			<entry key="xml" value="application/xml" />
+		</jaxrs:extensionMappings>
+		<jaxrs:languageMappings>
+			<entry key="en" value="en-gb" />
+		</jaxrs:languageMappings>
+		<jaxrs:providers>
+			<!-- <bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider"> <property 
+				name="dropRootElement" value="true" /> <property name="supportUnwrapped" 
+				value="true" /> </bean> -->
+			<!-- 用于解决No message body writer has been found for class XXX.XXX.XXX, 
+				ContentType: application/json -->
+			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">
+				<constructor-arg><bean class="cn.st.cxf.rs.provider.JsonMapper"/></constructor-arg>
+			</bean>
+			<bean class="cn.st.cxf.rs.exception.InvokeFaultExceptionMapper" />
+		</jaxrs:providers>
+		<jaxrs:features>
+			<!-- <cxf:logging /> -->
+		</jaxrs:features>
+	</jaxrs:server>
+	<!-- 配置RESTful标准Web Service发布方式=========结束===== -->
+</beans>
