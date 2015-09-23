@@ -1,5 +1,7 @@
 package cn.st.cxf.rs.server;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -8,14 +10,18 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.model.wadl.Description;
 import org.apache.cxf.jaxrs.model.wadl.Descriptions;
 import org.apache.cxf.jaxrs.model.wadl.DocTarget;
 
 import cn.st.cxf.rs.entity.Student;
 
-@Produces(MediaType.APPLICATION_JSON)
+@Produces({MediaType.APPLICATION_JSON})
 @Path("/student")
 public interface StudentWS {
     @POST
@@ -37,8 +43,7 @@ public interface StudentWS {
     @Path("/find/{id}")
     @Descriptions({@Description(value = "根据id查找学生", target = DocTarget.METHOD),
             @Description(value = "返回学生", target = DocTarget.RETURN)})
-    @Consumes(MediaType.APPLICATION_JSON)
-    Student find(@Description(value = "学生id", target = DocTarget.PARAM) @PathParam("id") Long id)
+    Response find(@Description(value = "学生id", target = DocTarget.PARAM) @PathParam("id") Long id)
             throws Exception;
 
     @GET
@@ -48,5 +53,13 @@ public interface StudentWS {
     @Consumes(MediaType.APPLICATION_JSON)
     String delete(@Description(value = "学生id", target = DocTarget.PARAM) @PathParam("id") Long id)
             throws Exception;
+
+    @POST
+    @Consumes("multipart/form-data")
+    @Path("/upload")
+    public String upload(@Multipart(value = "name", required = true) String name, @Multipart(
+            value = "file", required = false) List<Attachment> attachments, MultipartBody body)
+            throws Exception;
+
 
 }

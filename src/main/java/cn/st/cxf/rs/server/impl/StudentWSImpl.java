@@ -1,13 +1,23 @@
 package cn.st.cxf.rs.server.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.activation.DataHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.springframework.http.HttpHeaders;
 
 import cn.st.cxf.rs.entity.Student;
 import cn.st.cxf.rs.server.StudentWS;
@@ -34,10 +44,12 @@ public class StudentWSImpl implements StudentWS {
     }
 
     @Override
-    public Student find(Long id) throws Exception {
+    public Response find(Long id) throws Exception {
         // TODO Auto-generated method stub
         System.out.println(getIp());
-        return studentMap.get(id);
+        return Response.ok().entity(studentMap.get(id))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON + ";charset=UTF-8")
+                .build();
     }
 
     @Override
@@ -51,6 +63,24 @@ public class StudentWSImpl implements StudentWS {
         // TODO Auto-generated method stub
         Student student = new ObjectMapper().readValue(st, Student.class);
         return new ObjectMapper().writeValueAsString(student != null ? "插入成功！" : "插入失败");
+    }
+
+    @Override
+    public String upload(String name, List<Attachment> attachments, MultipartBody body)
+            throws Exception {
+
+        for (Attachment a : attachments) {
+            DataHandler handler = a.getDataHandler();
+            ContentDisposition cd = a.getContentDisposition();
+            System.out.println();
+            BufferedReader bufferedReader =
+                    new BufferedReader(new InputStreamReader(handler.getInputStream()));
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+        return new ObjectMapper().writeValueAsString("上传成功！");
     }
 
     private String getIp() {

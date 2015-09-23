@@ -24,7 +24,7 @@
 	<!-- 这里的地址很重要，客户端需要通过这个地址来访问WebService -->
 	<jaxrs:server id="restServiceContainer" address="/">
 		<jaxrs:inInterceptors>
-			<bean class="cn.st.cxf.rs.interceptor.PermissionInInterceptor"></bean>
+			<!-- <bean class="cn.st.cxf.rs.interceptor.PermissionInInterceptor"></bean> -->
 			<bean class="cn.st.cxf.rs.interceptor.LogInInterceptor"></bean>
 		</jaxrs:inInterceptors>
 		<jaxrs:outInterceptors>
